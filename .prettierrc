@@ -1,0 +1,23 @@
+{
+	"printWidth": 120,
+	"tabWidth": 4,
+	"useTabs": true,
+	"semi": true,
+	"endOfLine": "auto",
+	"bracketSpacing": true,
+	"overrides": [
+		{
+			"files": ["*.ts", "*.tsx"],
+			"options": {
+				"parser": "typescript"
+			}
+		},
+		{
+			"files": ["*.json", "*.jsonc", ".babelrc", ".prettierrc"],
+			"options": {
+				"parser": "json"
+			}
+		}
+	],
+	"singleQuote": false
+}

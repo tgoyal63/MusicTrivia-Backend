@@ -34,7 +34,8 @@
             "config/*": ["./config/*"],
             "utils/*": ["./utils/*"],
             "helpers/*": ["./helpers/*"],
-            "models/*": ["./models/*"]
+            "models/*": ["./models/*"],
+            "socket/*":["./socket/*"]
         }
     },
     "include": ["src/**/*", "./commitlint.config.ts", "./jest.config.ts"]

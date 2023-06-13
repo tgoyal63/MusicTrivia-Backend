@@ -1,5 +1,5 @@
 import { Socket, Server } from "socket.io";
-import { ACTIONS } from "socket/ACTIONS";
+import { ACTIONS } from "constants/ACTIONS";
 
 const codeEditorListeners = (socket: Socket, io: Server): void => {
 	socket.on(ACTIONS.JOIN, ({ roomId }: { roomId: string }) => {

@@ -14,7 +14,7 @@ import socket from "./socket";
 
 const app: Express = express();
 app.use(express.json({ limit: "16mb" }));
-app.use("/public", express.static("public"));
+app.use(express.urlencoded({ extended: true }));
 
 const origin: string[] = process.env["CORS_ORIGIN"]?.split(",") || [];
 const corsOptions: CorsOptions = {
@@ -26,7 +26,7 @@ app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
-dbConnect();
+app.use("/public", express.static("public"));
 
 app.use("/users", userRouter);
 
@@ -47,10 +47,12 @@ try {
 	});
 } catch (error) {
 	console.log("Couldnt find SSL information, running an HTTP server instead.");
-	const port: number = parseInt(process.env["PORT"] || "5000");
-	const server: Server = createServer(app);
-	socket(server);
-	server.listen(port, () => {
-		console.log(`HTTP Server is running on port ${port}`);
+	dbConnect().then(() => {
+		const port: number = parseInt(process.env["PORT"] || "5000");
+		const server: Server = createServer(app);
+		socket(server);
+		server.listen(port, () => {
+			console.log(`HTTP Server is running on port ${port}`);
+		});
 	});
 }

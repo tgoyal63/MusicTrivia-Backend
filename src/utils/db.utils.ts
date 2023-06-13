@@ -1,12 +1,18 @@
 import mongoose from "mongoose";
 
-function dbConnect(): void {
+function dbConnect(): Promise<void> {
 	mongoose.set("strictQuery", false);
 	mongoose.connect(process.env["MONGO_URI"] ?? "");
 	const db = mongoose.connection;
-	db.on("error", console.error.bind(console, "connection error:"));
-	db.once("open", () => {
-		console.log("Connected to MongoDB");
+	return new Promise((resolve, reject) => {
+		db.once("open", () => {
+			console.log("Connected to MongoDB");
+			resolve();
+		});
+		db.on("error", (error) => {
+			console.error.bind(console, "connection error:");
+			reject(error);
+		});
 	});
 }
 

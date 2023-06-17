@@ -1,7 +1,8 @@
 import { Router } from "express";
-// import AuthController from "controllers/auth.controller";
+import AuthController from "controllers/auth.controller";
 const router: Router = Router();
 
-// router.post("/send-otp", AuthController.sendOtp);
+router.get("/sign-in", AuthController.signIn);
+router.get("/callback", AuthController.callback);
 
 export default router;

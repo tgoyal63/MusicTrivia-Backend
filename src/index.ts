@@ -52,7 +52,7 @@ try {
 			const port: number = parseInt(process.env["PORT"] || "5000");
 			const server: Server = createServer(app);
 			socket(server);
-			server.listen(port, () => {
+			app.listen(port, () => {
 				console.log(`HTTP Server is running on port ${port}`);
 			});
 		});

@@ -50,9 +50,9 @@ try {
 		.sequelize.sync()
 		.then(() => {
 			const port: number = parseInt(process.env["PORT"] || "5000");
-			const server: Server = createServer(app);
+			const server: Server = new Server(app);
 			socket(server);
-			app.listen(port, () => {
+			server.listen(port, () => {
 				console.log(`HTTP Server is running on port ${port}`);
 			});
 		});

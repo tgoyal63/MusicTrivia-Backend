@@ -7,8 +7,7 @@ import { createServer } from "https";
 import cors, { CorsOptions } from "cors";
 import { readFileSync } from "fs";
 import cookieParser from "cookie-parser";
-
-import dbConnect from "utils/db.utils";
+import { initializeDatabase } from "./models";
 import userRouter from "routes/user.routes";
 import socket from "./socket";
 
@@ -47,12 +46,14 @@ try {
 	});
 } catch (error) {
 	console.log("Couldnt find SSL information, running an HTTP server instead.");
-	dbConnect().then(() => {
-		const port: number = parseInt(process.env["PORT"] || "5000");
-		const server: Server = createServer(app);
-		socket(server);
-		server.listen(port, () => {
-			console.log(`HTTP Server is running on port ${port}`);
+	initializeDatabase()
+		.sequelize.sync()
+		.then(() => {
+			const port: number = parseInt(process.env["PORT"] || "5000");
+			const server: Server = createServer(app);
+			socket(server);
+			server.listen(port, () => {
+				console.log(`HTTP Server is running on port ${port}`);
+			});
 		});
-	});
 }

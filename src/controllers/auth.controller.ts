@@ -9,7 +9,6 @@ const AuthController = {
 		);
 	},
 	callback: async (req: Request, res: Response) => {
-		console.log(req);
 		if (!req.query["code"] || req.query["state"] !== process.env["SPOTIFY_STATE"]) {
 			res.status(403).send("Invalid state parameter");
 			return;

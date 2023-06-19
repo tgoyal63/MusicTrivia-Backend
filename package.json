@@ -28,6 +28,7 @@
     "@types/express": "^4.17.17",
     "@types/node": "^20.3.0",
     "@types/socket.io": "^3.0.2",
+    "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "@typescript-eslint/parser": "^5.59.11",
     "eslint": "^8.42.0",
@@ -52,6 +53,7 @@
     "pg": "^8.11.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.32.0",
-    "socket.io": "^4.6.2"
+    "socket.io": "^4.6.2",
+    "uuid": "^9.0.0"
   }
 }

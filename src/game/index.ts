@@ -19,7 +19,7 @@ export interface Track {
 }
 
 export class Room {
-	constructor(players: User[], tracks: Track[], totalRounds: number) {
+	constructor(players: User[], tracks: Track[], totalRounds: number, roomHost: User) {
 		if (tracks.length < 20) {
 			throw new Error("Room must have at least 20 tracks");
 		}
@@ -28,15 +28,29 @@ export class Room {
 			this.numberOfPlayers++;
 		});
 		this.onGoingGame = new Game(tracks, totalRounds, this);
+		this.roomHost = roomHost;
 	}
 	roomId = uuidv4();
 	gameStarted = false;
 	players: { [id: string]: User } = {};
 	numberOfPlayers = 0;
 	onGoingGame: Game;
+	roomHost: User;
 	PreviousGames: { [gameId: string]: Game } = {};
+	startGame = () => {
+		if (this.numberOfPlayers < 2) throw new Error("Room must have atleast 2 player.");
+		this.gameStarted = true;
+		return this.onGoingGame.onGoingRound.dataForRoundStart();
+	};
 	addUser = (user: User) => {
+		this.numberOfPlayers++;
 		this.players[user.id] = user;
+	};
+	removeUser = (user?: User) => {
+		if (user) {
+			delete this.players[user.id];
+			this.numberOfPlayers--;
+		}
 	};
 }
 
@@ -55,7 +69,7 @@ export class Game {
 	gameTracks: Track[];
 	room: Room;
 	generateNewRound = (roundNumber: number) => {
-		const isSongRound = Math.random() < 0.5;
+		const isSongRound = true || Math.random() < 0.5;
 		if (isSongRound) {
 			// select 4 random Track.names from element.title of each Track in gameTracks array
 			const randomTracks = this.gameTracks.sort(() => Math.random() - 0.5);
@@ -77,11 +91,18 @@ export class Game {
 			return new GameRound(dummyTrack, [], isSongRound, roundNumber, this, this.room);
 		}
 	};
+	nextRound = (newRoundNumber: number) => {
+		if (this.onGoingRound.roundNumber !== newRoundNumber - 1) throw new Error("Round not found");
+		this.onGoingRound.ongoing = false;
+		this.playedTracks[this.onGoingRound.answerTrack.id] = this.onGoingRound.answerTrack;
+		this.rounds[newRoundNumber - 1] = this.onGoingRound;
+		this.onGoingRound = this.generateNewRound(newRoundNumber);
+	};
 }
 
 export class GameRound {
 	constructor(Track: Track, options: string[], isSongRound: boolean, roundNumber: number, game: Game, room: Room) {
-		this.audio = Track;
+		this.answerTrack = Track;
 		this.options = options;
 		this.ongoing = true;
 		this.isSongRound = isSongRound;
@@ -90,10 +111,26 @@ export class GameRound {
 		this.room = room;
 	}
 	isSongRound: boolean;
-	audio: Track;
+	answerTrack: Track;
 	options: string[];
 	ongoing: boolean;
 	roundNumber: number;
 	game: Game;
 	room: Room;
+	dataForRoundStart = () => {
+		this.ongoing = true;
+		return {
+			roundNumber: this.roundNumber,
+			audio: this.answerTrack.audio,
+			options: this.options,
+		};
+	};
+	dataForRoundEnd = (roundNumber: number) => {
+		if (roundNumber !== this.roundNumber) throw new Error("invalid roundnumber");
+		this.ongoing = false;
+		return {
+			roundNumber: this.roundNumber,
+			track: this.answerTrack,
+		};
+	};
 }

@@ -19,6 +19,13 @@ export interface Track {
 }
 
 export class Room {
+	roomId = uuidv4();
+	gameStarted = false;
+	players: { [id: string]: User } = {};
+	numberOfPlayers = 0;
+	onGoingGame: Game;
+	roomHost: User;
+	previousGames: { [gameId: string]: Game } = {};
 	constructor(players: User[], tracks: Track[], totalRounds: number, roomHost: User) {
 		if (tracks.length < 20) {
 			throw new Error("Room must have at least 20 tracks");
@@ -30,13 +37,6 @@ export class Room {
 		this.onGoingGame = new Game(tracks, totalRounds, this);
 		this.roomHost = roomHost;
 	}
-	roomId = uuidv4();
-	gameStarted = false;
-	players: { [id: string]: User } = {};
-	numberOfPlayers = 0;
-	onGoingGame: Game;
-	roomHost: User;
-	PreviousGames: { [gameId: string]: Game } = {};
 	startGame = () => {
 		if (this.numberOfPlayers < 2) throw new Error("Room must have atleast 2 player.");
 		this.gameStarted = true;
@@ -55,12 +55,6 @@ export class Room {
 }
 
 export class Game {
-	constructor(tracks: Track[], totalRounds: number, room: Room) {
-		this.gameTracks = tracks;
-		this.onGoingRound = this.generateNewRound(1);
-		this.totalRounds = totalRounds;
-		this.room = room;
-	}
 	gameId = uuidv4();
 	totalRounds: number;
 	rounds: { [id: number]: GameRound } = {};
@@ -68,6 +62,12 @@ export class Game {
 	onGoingRound: GameRound;
 	gameTracks: Track[];
 	room: Room;
+	constructor(tracks: Track[], totalRounds: number, room: Room) {
+		this.gameTracks = tracks;
+		this.onGoingRound = this.generateNewRound(1);
+		this.totalRounds = totalRounds;
+		this.room = room;
+	}
 	generateNewRound = (roundNumber: number) => {
 		const isSongRound = true || Math.random() < 0.5;
 		if (isSongRound) {
@@ -101,6 +101,13 @@ export class Game {
 }
 
 export class GameRound {
+	isSongRound: boolean;
+	answerTrack: Track;
+	options: string[];
+	ongoing: boolean;
+	roundNumber: number;
+	game: Game;
+	room: Room;
 	constructor(Track: Track, options: string[], isSongRound: boolean, roundNumber: number, game: Game, room: Room) {
 		this.answerTrack = Track;
 		this.options = options;
@@ -110,13 +117,6 @@ export class GameRound {
 		this.game = game;
 		this.room = room;
 	}
-	isSongRound: boolean;
-	answerTrack: Track;
-	options: string[];
-	ongoing: boolean;
-	roundNumber: number;
-	game: Game;
-	room: Room;
 	dataForRoundStart = () => {
 		this.ongoing = true;
 		return {

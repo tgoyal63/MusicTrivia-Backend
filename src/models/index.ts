@@ -1,9 +1,11 @@
 import { Sequelize } from "sequelize";
 import Song from "./song";
+import User from "./user";
 
 export interface Database {
 	sequelize: Sequelize;
 	songs: typeof Song;
+	users: typeof User;
 }
 
 /**
@@ -35,6 +37,7 @@ export function initializeDatabase(): Database {
 	const db: Database = {
 		sequelize,
 		songs: Song.initModel(sequelize),
+		users: User.initModel(sequelize),
 	};
 
 	return db;

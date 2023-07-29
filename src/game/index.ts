@@ -1,7 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
+import SpotifyUtils from "../utils/spotify.utils";
 
 const dummyTrack = { id: "", audio: "", title: "", artists: [] };
 
+// unique name and unique user id
 export interface User {
 	id: string;
 	name: string;
@@ -23,34 +25,37 @@ export class Room {
 	gameStarted = false;
 	players: { [id: string]: User } = {};
 	numberOfPlayers = 0;
-	onGoingGame: Game;
-	roomHost: User;
+	currentPlaylist?: string;
+	onGoingGame?: Game;
+	host: User;
 	previousGames: { [gameId: string]: Game } = {};
-	constructor(players: User[], tracks: Track[], totalRounds: number, roomHost: User) {
-		if (tracks.length < 20) {
-			throw new Error("Room must have at least 20 tracks");
-		}
-		players.forEach((player) => {
-			this.players[player.id] = player;
-			this.numberOfPlayers++;
-		});
-		this.onGoingGame = new Game(tracks, totalRounds, this);
-		this.roomHost = roomHost;
+	constructor(roomHost: User) {
+		this.host = roomHost;
+		this.addUser(roomHost);
 	}
-	startGame = () => {
-		if (this.numberOfPlayers < 2) throw new Error("Room must have atleast 2 player.");
+	startGame = async (totalRounds: number) => {
+		if (totalRounds < 5) throw new Error("Room must have at least 5 rounds.");
+		if (!this.currentPlaylist) throw new Error("Room must have a current playlist.");
+		const tracks = await SpotifyUtils.getTracksFromPlaylist(this.currentPlaylist);
+		if (tracks.length < 4 * totalRounds) throw new Error(`Room must have at least ${4 * totalRounds} tracks.`);
+		this.onGoingGame = new Game(tracks, this.currentPlaylist, totalRounds, this);
+		if (this.gameStarted) throw new Error("Game already started.");
 		this.gameStarted = true;
-		return this.onGoingGame.onGoingRound.dataForRoundStart();
+		return this.onGoingGame?.onGoingRound.dataForRoundStart();
+	};
+	setCurrentPlaylist = (playlist: string) => {
+		this.currentPlaylist = playlist;
 	};
 	addUser = (user: User) => {
 		this.numberOfPlayers++;
+		if (this.players[user.id]) throw new Error("User already exists");
 		this.players[user.id] = user;
 	};
 	removeUser = (user?: User) => {
-		if (user) {
-			delete this.players[user.id];
-			this.numberOfPlayers--;
-		}
+		if (!user) throw new Error("User not found");
+		if (!this.players[user.id]) throw new Error("User not found");
+		delete this.players[user.id];
+		this.numberOfPlayers--;
 	};
 }
 
@@ -61,16 +66,20 @@ export class Game {
 	playedTracks: { [id: string]: Track } = {};
 	onGoingRound: GameRound;
 	gameTracks: Track[];
+	playlist: string;
 	room: Room;
-	constructor(tracks: Track[], totalRounds: number, room: Room) {
+	constructor(tracks: Track[], playlist: string, totalRounds: number, room: Room) {
 		this.gameTracks = tracks;
+		this.playlist = playlist;
 		this.onGoingRound = this.generateNewRound(1);
 		this.totalRounds = totalRounds;
 		this.room = room;
+		if (!this.room.currentPlaylist) throw new Error("No playlist found");
 	}
 	generateNewRound = (roundNumber: number) => {
-		const isSongRound = true || Math.random() < 0.5;
+		const isSongRound = true || Math.random() < 0.5; // ToDo: Fix this true
 		if (isSongRound) {
+			if (!this.gameTracks) throw new Error("No tracks found");
 			// select 4 random Track.names from element.title of each Track in gameTracks array
 			const randomTracks = this.gameTracks.sort(() => Math.random() - 0.5);
 			const uniqueRandomTracks = randomTracks.filter((Track) => {
@@ -87,7 +96,7 @@ export class Game {
 			this.playedTracks[answerTrack.id] = answerTrack;
 			return new GameRound(answerTrack, fourRandomTrackNames, isSongRound, roundNumber, this, this.room);
 		} else {
-			// to be coded
+			// ToDo: For Artist Tracks
 			return new GameRound(dummyTrack, [], isSongRound, roundNumber, this, this.room);
 		}
 	};

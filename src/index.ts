@@ -12,6 +12,7 @@ import userRouter from "routes/user.routes";
 import socket from "./socket";
 
 const app: Express = express();
+const PORT = process.env["PORT"];
 app.use(express.json({ limit: "16mb" }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,7 +39,7 @@ try {
 		key: readFileSync("./ssl_certificates/private.key"),
 		cert: readFileSync("./ssl_certificates/certificate.crt"),
 	};
-	const sslPort: number = parseInt(process.env["PORT"] || "8443");
+	const sslPort: number = parseInt(PORT || "8443");
 	const httpsServer = createServer(httpsOptions, app);
 	socket(httpsServer);
 	httpsServer.listen(sslPort, () => {
@@ -49,7 +50,7 @@ try {
 	// initializeDatabase()
 	// 	.sequelize.sync()
 	// 	.then(() => {
-	const port: number = parseInt(process.env["PORT"] || "5000");
+	const port: number = parseInt(PORT || "5000");
 	const server: Server = new Server(app);
 	socket(server);
 	server.listen(port, () => {

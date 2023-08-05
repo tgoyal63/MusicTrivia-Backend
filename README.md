@@ -68,3 +68,7 @@ This project is licensed under the ISC License.
 
 ### Project Link
 [https://github.com/tgoyal63/MusicTrivia](https://github.com/tgoyal63/MusicTrivia)
+
+### Contributors
+- ### Tushar Goyal <a href="https://linkedin.com/in/tgoyal63" target="blank"><img align="center" src="https://github.com/tandpfun/skill-icons/raw/main/icons/LinkedIn.svg" alt="tgoyal63-linkedin" width="16"/></a> <a href="https://github.com/tgoyal63" target="blank"><img align="center" src="https://github.com/tandpfun/skill-icons/raw/main/icons/Github-Dark.svg" alt="tgoyal63-github" width="20" /></a>
+- ### Sidhant Shahi <a href="https://linkedin.com/in/teoriya" target="blank"><img align="center" src="https://github.com/tandpfun/skill-icons/raw/main/icons/LinkedIn.svg" alt="teoriya-linkedin" width="16"/></a> <a href="https://github.com/teoriya" target="blank"><img align="center" src="https://github.com/tandpfun/skill-icons/raw/main/icons/Github-Dark.svg" alt="teoriya-github" width="20" /></a>
